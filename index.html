@@ -442,8 +442,8 @@ function closeForm() {
   document.getElementById("form-modal").classList.remove("open");
 }
 
-function publish() {
-  const caption = document.getElementById("caption").value;
+async function publish() {
+  const caption = document.getElementById("caption").value.trim();
   const file = document.getElementById("upload-file").files[0];
 
   if (!caption && !file) {
@@ -451,10 +451,55 @@ function publish() {
     return;
   }
 
-  alert("Great! Your " + currentType + " creation screen is working. Publishing will be added later.");
-  closeForm();
-}
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
 
+    if (userError || !user) {
+      alert("Please log in before publishing!");
+      return;
+    }
+
+    let fileUrl = null;
+
+    if (file) {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const filePath = `${user.id}/${Date.now()}-${safeName}`;
+
+      const { error: uploadError } = await supabaseClient.storage
+        .from("orbit-media")
+        .upload(filePath, file, {
+          contentType: file.type
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabaseClient.storage
+        .from("orbit-media")
+        .getPublicUrl(filePath);
+
+      fileUrl = data.publicUrl;
+    }
+
+    const { error: postError } = await supabaseClient
+      .from("posts")
+      .insert({
+        user_id: user.id,
+        caption: caption || null,
+        file_url: fileUrl,
+        content_type: currentType.toLowerCase()
+      });
+
+    if (postError) throw postError;
+
+    alert("Successfully published to ORBIT! 🚀");
+    closeForm();
+
+  } catch (error) {
+    console.error("Publishing error:", error);
+    alert("Publishing failed: " + error.message);
+  }
+}
 /* WATCH HISTORY */
 
 function openVideo(title) {
