@@ -492,8 +492,9 @@ async function publish() {
 
     if (postError) throw postError;
 
-    alert("Successfully published to ORBIT! 🚀");
-    closeForm();
+alert("Successfully published to ORBIT! 🚀");
+closeForm();
+await loadHomePosts();
 
   } catch (error) {
     console.error("Publishing error:", error);
