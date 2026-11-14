@@ -500,7 +500,47 @@ async function publish() {
     alert("Publishing failed: " + error.message);
   }
 }
-/* WATCH HISTORY */
+async function loadHomePosts() {
+  const container = document.getElementById("home-posts");
+
+  const { data: posts, error } = await supabaseClient
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Could not load posts:", error);
+    return;
+  }
+
+  if (!posts || posts.length === 0) return;
+
+  container.innerHTML = posts.map(post => {
+    const caption = document.createElement("div");
+    caption.textContent = post.caption || "";
+
+    let media = "";
+
+    if (post.file_url) {
+      if (["video", "orbit"].includes(post.content_type)) {
+        media = `<video src="${post.file_url}" controls style="width:100%"></video>`;
+      } else {
+        media = `<img src="${post.file_url}" style="width:100%;border-radius:12px">`;
+      }
+    }
+
+    return `
+      <div class="panel">
+        <h3>${post.content_type.toUpperCase()}</h3>
+        <p>${caption.innerHTML}</p>
+        ${media}
+      </div>
+    `;
+  }).join("");
+}
+
+loadHomePosts();
+  /* WATCH HISTORY */
 
 function openVideo(title) {
   document.getElementById("watch-title").textContent = title;
