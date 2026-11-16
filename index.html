@@ -327,6 +327,28 @@ textarea { min-height:100px; resize:vertical; }
   </div>
 </main>
 <div id="home-posts"></div>
+  <div id="edit-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h2>Edit your content</h2>
+
+    <label>Title</label>
+    <input id="edit-title" type="text" placeholder="Enter a title">
+
+    <label>Caption</label>
+    <textarea id="edit-caption" placeholder="Write a caption"></textarea>
+
+    <label>Visibility</label>
+    <select id="edit-visibility">
+      <option value="public">Public</option>
+      <option value="private">Private</option>
+    </select>
+
+    <div class="edit-buttons">
+      <button onclick="saveEdit()">Save Changes</button>
+      <button onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 <div class="modal" id="create-modal">
   <div class="modal-content">
     <button class="close-button" onclick="closeCreate()">×</button>
