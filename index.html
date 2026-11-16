@@ -584,44 +584,8 @@ async function loadHomePosts() {
   });
 }
 
-async function editPost(id) {
-  const { data: post, error } = await supabaseClient
-    .from("posts")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  const type = post.content_type.toLowerCase();
-
-  const updates = {};
-
-  if (type !== "post") {
-    const title = prompt("Change title:", post.title || "");
-    if (title === null) return;
-    updates.title = title;
-  }
-
-  const caption = prompt("Change caption:", post.caption || "");
-  if (caption === null) return;
-  updates.caption = caption;
-
-  const { error: updateError } = await supabaseClient
-    .from("posts")
-    .update(updates)
-    .eq("id", id);
-
-  if (updateError) {
-    alert(updateError.message);
-    return;
-  }
-
-  alert("Your content has been updated!");
-  await loadHomePosts();
+function editPost(id) {
+  openEditModal(id);
 }
 
 async function deletePost(id) {
